@@ -1,6 +1,6 @@
 import pytest
 
-from src.widget import mask_account_card
+from src.widget import mask_account_card, get_date
 
 
 @pytest.mark.parametrize('input_str, expected', [
@@ -36,3 +36,8 @@ def test_mask_account_card_invalid_number():
 def test_mask_account_card_empty_string():
     with pytest.raises(ValueError):
         mask_account_card("")
+
+
+def test_get_date():
+    result = get_date("2024-03-11T02:26:18.671407")
+    assert result == "11.03.2024"
