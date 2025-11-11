@@ -1,14 +1,12 @@
 """Модуль для обработки списков словарей (фильтрация, сортировка)."""
 
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any, Dict, List
 
 
 def filter_by_state(data: List[Dict[str, Any]], state: str = "EXECUTED") -> List[Dict[str, Any]]:
     """Фильтрует список словарей по значению ключа 'state'."""
     return [item for item in data if item.get("state") == state]
-
-
-from datetime import datetime
 
 
 def sort_by_date(data: List[Dict[str, Any]], reverse: bool = True) -> List[Dict[str, Any]]:
