@@ -1,38 +1,33 @@
 # Цель проекта:
 
-__Написать тесты ко всем функциям проекта__
+___Создать модуль generators, который будет содержать функции для работы с массивами транзакций.___
 
 ## Инструкция и использование:
-```
-Тесты находятся в новой ветки домашней работы feature/homework_10_2
-```
-* Модули тестируются в отдельных тестовых файлах. 
-* Функциональный код покрыт тестами более чем на 80%. 
-* При запуске тестов командой pytest все тесты завершаются успешно.
+* Функция filter_by_currency принимает список словарей на вход. 
+* Функция filter_by_currency возвращает итератор. 
+* Реализована функция-генератор transaction_descriptions . 
+* Функция-генератор transaction_descriptions принимает на вход список словарей. 
+* Функция-генератор transaction_descriptions использует yield для генерации значений по запросу. 
+* Реализован генератор card_number_generator. 
+* Генератор card_number_generator принимает значения start и stop в качестве аргумента.
 
 ## Примеры работы функций:
+
+1. ___для функции filter_by_currency___
+    > def filter_by_currency(transactions: List[Dict], currency_code: str) -> Iterator[Dict]:
+
+2. ___для функции transaction_descriptions___
+    > def transaction_descriptions(transactions: List[Dict]) -> Iterator[str]:
+
+3. ___для функции card_number_generator___
+    > def card_number_generator(start: int, stop: int) -> Iterator[str]:
+
+
 ```
-Для каждого модуля в папке src/ созданы тесты с функциями:
+*
+Так же для модуля generators в папке tests/ созданы тесты с функциями. 
+Функциональный код покрыт тестами более чем на 80%.
+При запуске тестов командой pytest все тесты завершаются успешно.
+В тестах используются фикстуры для генерации данных для теста.
+В репозитории есть папка с отчетом покрытия тестами в формате HTML.
 ```
-
-1. ___для модуля masks.py___
-    > tests/test_masks.py
-- def test_get_mask_card_number
-- def test_get_mask_card_number_invalid_length
-
-2. ___для модуля widget.py___
-    > tests/test_widget.py
-- def test_mask_account_card
-- def test_mask_account_card_invalid_number
-- def test_mask_account_card_no_number
-- def test_mask_account_card_empty_string
-- def test_get_date
-
-3. ___для модуля test_processing.py___
-    > tests/test_processing.py
-- def test_filter_by_state_default
-- def test_filter_by_state_canceled
-- def test_sort_by_date_descending
-
-***Так же в проекте применины фикстуры для создания необходимых входных данных для тестов,
-и использованна параметризация в тестах для обеспечения тестирования функциональности с различными входными данными.***
