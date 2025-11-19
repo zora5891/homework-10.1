@@ -1,0 +1,6 @@
+error_function error: ZeroDivisionError. Inputs: (10, 0), {}
+error_function error: ZeroDivisionError. Inputs: (10, 0), {}
+error_function error: ZeroDivisionError. Inputs: (10, 0), {}
+error_function error: ZeroDivisionError. Inputs: (10, 0), {}
+error_function error: ZeroDivisionError. Inputs: (10, 0), {}
+error_function error: ZeroDivisionError. Inputs: (10, 0), {}
