@@ -6,19 +6,31 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-EXCHANGE_API_URL = "https://api.exchangerate-api.com/v4/latest/USD"
+EXCHANGE_API_URL = "https://marketplace.apilayer.com/exchangerates_data-api"
 API_KEY = os.getenv("EXCHANGE_API_KEY")
 
 
 def get_exchange_rate(currency: str) -> float:
     """Получает текущий курс валюты"""
     try:
+        url = f"{EXCHANGE_API_URL}?access_key={API_KEY}"
+        print(f"Отправляем запрос: {url}")
+
         response = requests.get(f"{EXCHANGE_API_URL}?access_key={API_KEY}")
         response.raise_for_status()
         data = response.json()
-        return data["rates"].get(currency, 1.0)
-    except requests.RequestException:
+        if not data.get("success", False):
+            error_msg = data.get("error", "Unknown error")
+            raise ValueError(f"API error: {error_msg}")
+
+        rate = data["rates"].get(currency)
+        if rate is None:
+            print(f"Курс для {currency} не найден, используем 1.0")
         return 1.0
+
+    except (requests.RequestException, ValueError, KeyError, TypeError) as e:
+        print(f"Ошибка при получении курса {currency}: {e}")
+    return 1.0
 
 
 def convert_amount_to_rub(transaction: Dict) -> float:
@@ -31,4 +43,6 @@ def convert_amount_to_rub(transaction: Dict) -> float:
     elif currency in ["USD", "EUR"]:
         rate = get_exchange_rate(currency)
         return amount * rate
-    return amount
+    else:
+        print(f"Неподдерживаемая валюта: {currency}, используем курс 1.0")
+        return amount
