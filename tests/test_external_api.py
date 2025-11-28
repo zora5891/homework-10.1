@@ -1,47 +1,42 @@
 from unittest.mock import patch
 
 import pytest
-import requests
 
-from data.external_api import convert_amount_to_rub, get_exchange_rate
-
-
-@pytest.mark.parametrize(
-    "transaction,expected",
-    [
-        ({"operationAmount": {"amount": "100", "currency": {"name": "USD", "code": "USD"}}}, 100),
-        ({"operationAmount": {"amount": "100", "currency": {"name": "EUR", "code": "EUR"}}}, 100),
-        ({"operationAmount": {"amount": "100", "currency": {"name": "RUB", "code": "RUB"}}}, 100),
-    ],
-)
-def test_convert_amount_to_rub(transaction, expected):
-    """Конвертация суммы транзакции в рубли"""
-    with patch("data.external_api.get_exchange_rate", return_value=1.0):
-        assert convert_amount_to_rub(transaction) == float(expected)
+from data.external_api import convert_to_rubles, get_exchange_rate
 
 
-def test_get_exchange_rate():
-    """Получение курса валют"""
-    with patch("requests.get") as mock_get:
-        mock_get.return_value.json.return_value = {"rates": {"USD": 1.0, "EUR": 1.0}}
+@patch.dict("os.environ", {"EXCHANGE_API_KEY": "", "EXCHANGE_API_URL": "https://api.test.com"})
+def test_no_api_key():
+    """Тест: отсутствует API ключ"""
+    with pytest.raises(ValueError, match="API key not found"):
+        get_exchange_rate("USD")
 
 
-def test_get_exchange_rate_error():
-    """Обработка ошибок при получении курса валют"""
-    with patch("requests.get") as mock_get:
-        mock_get.side_effect = requests.RequestException
-        rate = get_exchange_rate("USD")
-        assert rate == 1.0
+@patch.dict("os.environ", {"EXCHANGE_API_KEY": "test_key", "EXCHANGE_API_URL": ""})
+def test_no_api_url():
+    """Тест: отсутствует API URL"""
+    with pytest.raises(ValueError, match="API URL not found"):
+        get_exchange_rate("USD")
 
 
-def test_convert_amount_invalid_currency():
-    """Оработка неподдерживаемой валюты"""
-    transaction = {"operationAmount": {"amount": "100", "currency": {"name": "GBP", "code": "GBP"}}}
-    with patch("data.external_api.get_exchange_rate") as mock_rate:
-        # Проверяем, что метод не вызывается для неподдерживаемой валюты
-        mock_rate.assert_not_called()
+@patch("data.external_api.get_exchange_rate")
+def test_convert_to_rubles_usd(mock_get_rate):
+    """Тест конвертации USD в рубли"""
+    mock_get_rate.return_value = 90.0
 
-        # Проверяем результат конвертации
-        result = convert_amount_to_rub(transaction)
-        assert result == 100.0  # Возвращаем исходную сумму
-        assert isinstance(result, float)  # Проверяем тип данных
+    result = convert_to_rubles(100, "USD")
+
+    assert result == 9000.0
+    mock_get_rate.assert_called_once_with("USD")
+
+
+def test_convert_to_rubles_rub():
+    """Тест конвертации RUB в рубли"""
+    result = convert_to_rubles(1000, "RUB")
+    assert result == 1000.0
+
+
+def test_convert_to_rubles_unsupported_currency():
+    """Тест конвертации неподдерживаемой валюты"""
+    with pytest.raises(ValueError, match="Unsupported currency: GBP"):
+        convert_to_rubles(100, "GBP")

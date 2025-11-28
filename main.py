@@ -1,3 +1,4 @@
+from data.external_api import convert_to_rubles
 from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
 from src.masks import get_mask_account, get_mask_card_number
 from src.widget import get_date, mask_account_card
@@ -58,3 +59,25 @@ if __name__ == "__main__":
     # Пример использования card_number_generator
     for card_number in card_number_generator(1, 5):
         print(f"  - {card_number}")
+
+
+def process_transaction(transaction: dict) -> float:
+    """Обрабатывает транзакцию и возвращает сумму в рублях."""
+    amount = transaction["amount"]
+    currency = transaction["currency"].upper()
+
+    return convert_to_rubles(amount, currency)
+
+
+# Пример транзакции в USD
+transaction_usd = {"amount": 100.0, "currency": "USD"}
+
+# Пример транзакции в EUR
+transaction_eur = {"amount": 100.0, "currency": "EUR"}
+
+# Пример транзакции в RUB
+transaction_rub = {"amount": 100.0, "currency": "RUB"}
+
+print(f"USD → RUB: {process_transaction(transaction_usd):.2f} ₽")
+print(f"EUR → RUB: {process_transaction(transaction_eur):.2f} ₽")
+print(f"RUB → RUB: {process_transaction(transaction_rub):.2f} ₽")
