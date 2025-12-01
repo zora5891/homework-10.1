@@ -19,24 +19,22 @@ def test_no_api_url():
         get_exchange_rate("USD")
 
 
-@patch("data.external_api.get_exchange_rate")
-def test_convert_to_rubles_usd(mock_get_rate):
-    """Тест конвертации USD в рубли"""
-    mock_get_rate.return_value = 90.0
+@patch("requests.get")
+def test_convert_to_rubles_rub(mock_get):
+    """Если валюта уже в RUB — API не вызывается."""
+    transaction = {"amount": 150.0, "currency": "RUB"}
+    result = convert_to_rubles(transaction)
 
-    result = convert_to_rubles(100, "USD")
-
-    assert result == 9000.0
-    mock_get_rate.assert_called_once_with("USD")
-
-
-def test_convert_to_rubles_rub():
-    """Тест конвертации RUB в рубли"""
-    result = convert_to_rubles(1000, "RUB")
-    assert result == 1000.0
+    assert result == 150.0
+    mock_get.assert_not_called()  # API не должен быть вызван
 
 
-def test_convert_to_rubles_unsupported_currency():
-    """Тест конвертации неподдерживаемой валюты"""
-    with pytest.raises(ValueError, match="Unsupported currency: GBP"):
-        convert_to_rubles(100, "GBP")
+@patch("requests.get")
+def test_convert_to_rubles_api_error(mock_get):
+    """Если API вернуло ошибку (например, 404)"""
+    mock_get.return_value.raise_for_status.side_effect = Exception("API key not found")
+
+    transaction = {"amount": 100.0, "currency": "USD"}
+
+    with pytest.raises(Exception, match="API key not found"):
+        convert_to_rubles(transaction)

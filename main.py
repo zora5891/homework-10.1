@@ -61,23 +61,7 @@ if __name__ == "__main__":
         print(f"  - {card_number}")
 
 
-def process_transaction(transaction: dict) -> float:
-    """Обрабатывает транзакцию и возвращает сумму в рублях."""
-    amount = transaction["amount"]
-    currency = transaction["currency"].upper()
+transaction = {"amount": 100.0, "currency": "USD"}
 
-    return convert_to_rubles(amount, currency)
-
-
-# Пример транзакции в USD
-transaction_usd = {"amount": 100.0, "currency": "USD"}
-
-# Пример транзакции в EUR
-transaction_eur = {"amount": 100.0, "currency": "EUR"}
-
-# Пример транзакции в RUB
-transaction_rub = {"amount": 100.0, "currency": "RUB"}
-
-print(f"USD → RUB: {process_transaction(transaction_usd):.2f} ₽")
-print(f"EUR → RUB: {process_transaction(transaction_eur):.2f} ₽")
-print(f"RUB → RUB: {process_transaction(transaction_rub):.2f} ₽")
+rubles = convert_to_rubles(transaction)
+print(f"Сумма в рублях: {rubles}")
